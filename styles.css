@@ -1,0 +1,113 @@
+body {
+    margin: 0;
+    background: #1a1a1a;
+    font-family: Optima, -apple-system, system-ui, sans-serif;
+    color: #fff;
+}
+
+h1 {
+    text-align: left;
+    font-weight: normal;
+    margin: 2rem 1rem;
+    font-size: 1.2rem;
+    color: #FEFAF6;
+}
+
+h1 a {
+    color: inherit;
+}
+
+h1 a:hover {
+    text-decoration: underline;
+}
+
+.gallery {
+    columns: 6;
+    column-gap: 10px;
+    padding: 10px;
+    max-width: 2000px;
+    margin: 0 auto;
+}
+
+.gallery-item {
+    break-inside: avoid;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+}
+
+.gallery-item .thumb {
+    position: relative;
+}
+
+.gallery-item img,
+.gallery-item video {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 4px;
+}
+
+.gallery-item img {
+    transition: filter .2s;
+}
+
+.gallery-item:hover img {
+    filter: brightness(.8);
+}
+
+.play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 15px solid transparent;
+    border-left: 25px solid rgba(255,255,255,.8);
+    pointer-events: none;
+}
+
+.gallery-item:hover .play-button {
+    border-left-color: #fff;
+}
+
+.gallery-item a {
+    cursor: zoom-in;
+    display: block;
+}
+
+.pagination {
+    text-align: center;
+    padding: 2rem;
+    clear: both;
+    width: 100%;
+}
+
+.pagination button {
+    background: none;
+    border: 1px solid #fff3;
+    color: #fff;
+    padding: .5rem 1rem;
+    margin: 0 .5rem;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.pagination button:hover {
+    background: #fff1;
+}
+
+.pagination button:disabled {
+    opacity: .3;
+    cursor: default;
+}
+
+.pagination span {
+    margin: 0 1rem;
+}
+
+@media (max-width: 1600px) { .gallery { columns: 5; } }
+@media (max-width: 1200px) { .gallery { columns: 4; } }
+@media (max-width: 900px) { .gallery { columns: 3; } }
+@media (max-width: 600px) { .gallery { columns: 2; } }
+@media (max-width: 400px) { .gallery { columns: 1; } }
