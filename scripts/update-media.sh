@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Get the directory where the script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# Get the parent directory (project root)
+ROOT_DIR="$( cd "$SCRIPT_DIR/.." && pwd )"
+
+# Change to project root
+cd "$ROOT_DIR"
+
 # Create thumbnails directory if it doesn't exist
 mkdir -p thumbnails
 
@@ -31,14 +39,14 @@ done
 # Update fallback.json
 echo '{"files":[' > fallback.json
 (
-  cd images && \
+  cd images 2>/dev/null && \
   find . -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.gif" -o -name "*.mp4" -o -name "*.mov" -o -name "*.MOV" \) -exec basename {} \; | \
-  sed 's/.*/"&"/' | paste -sd "," -
+  sed 's/.*/"&"/' | paste -sd "," - || echo ""
 ) >> fallback.json
 echo ']}' >> fallback.json
 
 # Stage all changes including deletions
-git add -A images/ thumbnails/ fallback.json
+git add -A images/ thumbnails/ fallback.json 2>/dev/null || true
 
 # Commit and push if there are changes
 if ! git diff --cached --quiet; then
