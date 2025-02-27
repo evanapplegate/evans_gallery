@@ -6,6 +6,9 @@ on:
       - 'images/**'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   update-media:
     runs-on: ubuntu-latest
@@ -20,7 +23,7 @@ jobs:
       - name: Generate thumbnails
         run: |
           mkdir -p thumbnails
-          for video in images/*.{mp4,mov}; do
+          for video in images/*.{mp4,mov,MOV}; do
             if [ -f "$video" ]; then
               thumb="thumbnails/$(basename "${video%.*}").jpg"
               ffmpeg -i "$video" -vframes 1 -f image2 "$thumb"
@@ -32,7 +35,7 @@ jobs:
           echo '{"files":[' > fallback.json
           (
             cd images && \
-            find . -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.gif" -o -name "*.mp4" -o -name "*.mov" \) -exec basename {} \; | \
+            find . -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.gif" -o -name "*.mp4" -o -name "*.mov" -o -name "*.MOV" \) -exec basename {} \; | \
             sed 's/.*/"&"/' | paste -sd "," -
           ) >> fallback.json
           echo ']}' >> fallback.json
