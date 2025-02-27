@@ -111,7 +111,7 @@ async function fetchImages() {
         const files = await response.json();
         return files
             .filter(file => /\.(jpe?g|png|gif|mp4|mov)$/i.test(file.name))
-            .map(file => `images/${file.name}`);
+            .map(file => file.download_url);
     } catch (error) {
         console.error('Error fetching from GitHub API:', error);
         // Try fallback JSON
