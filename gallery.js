@@ -16,11 +16,9 @@ async function loadGallery() {
         const start = (currentPage - 1) * itemsPerPage;
         const end = start + itemsPerPage;
         
-        gallery.innerHTML = ''; // Clear loading message
-        
+        gallery.innerHTML = '';
         files.slice(start, end).forEach(path => gallery.appendChild(createGalleryItem(path)));
         
-        // If no images found
         if (files.length === 0) {
             gallery.innerHTML = '<div class="loading">No images found</div>';
         } else if (files.length > itemsPerPage) {
@@ -61,7 +59,6 @@ function createGalleryItem(path) {
         const playBtn = document.createElement('div');
         playBtn.className = 'play-button';
         
-        // Generate thumbnail once video metadata is loaded
         video.addEventListener('loadedmetadata', () => {
             video.currentTime = 0;
             video.addEventListener('seeked', () => {
@@ -108,24 +105,15 @@ function createGalleryItem(path) {
 
 async function fetchImages() {
     try {
-        allFiles = await listDirectory('images');
-        return allFiles
-            .filter(file => /\.(jpe?g|png|gif|mp4|mov)$/i.test(file))
-            .map(file => `images/${file}`);
+        const response = await fetch('https://api.github.com/repos/evanapplegate/evans_gallery/contents/images');
+        const files = await response.json();
+        return files
+            .filter(file => /\.(jpe?g|png|gif|mp4|mov)$/i.test(file.name))
+            .map(file => `images/${file.name}`);
     } catch (error) {
         console.error('Error fetching images:', error);
         return [];
     }
-}
-
-async function listDirectory(path) {
-    const response = await fetch(path);
-    const text = await response.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(text, 'text/html');
-    return Array.from(doc.querySelectorAll('a'))
-        .map(a => a.getAttribute('href'))
-        .filter(href => href && href !== '../'); // Filter out parent directory link
 }
 
 function changePage(page) {
