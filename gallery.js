@@ -55,21 +55,14 @@ function createGalleryItem(path) {
         const img = document.createElement('img');
         img.alt = path.split('/').pop().split('.')[0].replace(/-/g, ' ');
         img.loading = 'lazy';
+        // Use pre-generated thumbnail from GitHub
         img.src = path.replace(/\.(mp4|mov)$/i, '.jpg').replace('/images/', '/thumbnails/');
+        img.onerror = () => {
+            img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M10 9v6l5-3-5-3z"/></svg>';
+        };
         
         const playBtn = document.createElement('div');
         playBtn.className = 'play-button';
-        
-        video.addEventListener('loadedmetadata', () => {
-            video.currentTime = 0;
-            video.addEventListener('seeked', () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                canvas.getContext('2d').drawImage(video, 0, 0);
-                img.src = canvas.toDataURL();
-            }, { once: true });
-        });
         
         thumb.appendChild(img);
         thumb.appendChild(playBtn);
@@ -106,31 +99,27 @@ function createGalleryItem(path) {
 
 async function fetchImages() {
     try {
-        const files = [
-            '106137290_950741895351369_2785590421640695606_n.jpg',
-            '106370671_304773590932098_7948076694103571482_n.jpg',
-            '173935681_494693768244288_3906053175891981462_n.jpg',
-            '174316577_1786753361492680_7975184923832317449_n.jpg',
-            '239697528_525367972088239_5620429904857938783_n.jpg',
-            '310377770_3312985962315199_68466455150402006_n.jpg',
-            '313843793_5638036599589774_5112167168360310674_n.jpg',
-            '313851355_678190670297328_3123053017515208487_n.jpg',
-            '313852915_1070721593597021_7317912321735823821_n.jpg',
-            '313914617_682240856513002_3948867507483724422_n.jpg',
-            '315308003_3287643148177091_2400465916820476244_n (1).jpg',
-            '53051099_1981302465508196_785357706659864265_n.jpg',
-            '90710649_2629894620566159_1866899037223752325_n.jpg',
-            '91221882_213090123251041_9116725117342699283_n.jpg',
-            '91730101_667353620665649_734802778642280718_n.jpg',
-            '94387080_154212372758061_1334169763300600368_n.jpg',
-            'out2.mp4'
-        ];
-        return files.map(file => 
-            `https://media.githubusercontent.com/media/evanapplegate/evans_gallery/refs/heads/main/images/${file}`
-        );
+        const response = await fetch('https://api.github.com/repos/evanapplegate/evans_gallery/contents/images');
+        if (!response.ok) throw new Error('API request failed');
+        
+        const files = await response.json();
+        return files
+            .filter(file => /\.(jpe?g|png|gif|mp4|mov)$/i.test(file.name))
+            .map(file => `https://media.githubusercontent.com/media/evanapplegate/evans_gallery/refs/heads/main/images/${file.name}`);
     } catch (error) {
         console.error('Error:', error);
-        return [];
+        // Try fallback JSON
+        try {
+            const fallbackResponse = await fetch('fallback.json');
+            if (!fallbackResponse.ok) throw new Error('Fallback not found');
+            const { files } = await fallbackResponse.json();
+            return files.map(file => 
+                `https://media.githubusercontent.com/media/evanapplegate/evans_gallery/refs/heads/main/images/${file}`
+            );
+        } catch (fallbackError) {
+            console.error('Error loading fallback:', fallbackError);
+            return [];
+        }
     }
 }
 
