@@ -55,6 +55,7 @@ function createGalleryItem(path) {
         const img = document.createElement('img');
         img.alt = path.split('/').pop().split('.')[0].replace(/-/g, ' ');
         img.loading = 'lazy';
+        img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M10 9v6l5-3-5-3z"/></svg>';
         
         const playBtn = document.createElement('div');
         playBtn.className = 'play-button';
