@@ -1,3 +1,3 @@
 # Evan’s misc. gallery
 
-Big pile of map images my yours truly
+Big gallery of map projects by yours truly
