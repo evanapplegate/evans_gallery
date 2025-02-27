@@ -106,13 +106,34 @@ function createGalleryItem(path) {
 async function fetchImages() {
     try {
         const response = await fetch('https://api.github.com/repos/evanapplegate/evans_gallery/contents/images');
+        if (!response.ok) throw new Error('API request failed');
+        
         const files = await response.json();
         return files
             .filter(file => /\.(jpe?g|png|gif|mp4|mov)$/i.test(file.name))
             .map(file => `images/${file.name}`);
     } catch (error) {
-        console.error('Error fetching images:', error);
-        return [];
+        console.error('Error fetching from GitHub API:', error);
+        // Fallback to local directory
+        return [
+            'images/106137290_950741895351369_2785590421640695606_n.jpg',
+            'images/106370671_304773590932098_7948076694103571482_n.jpg',
+            'images/173935681_494693768244288_3906053175891981462_n.jpg',
+            'images/174316577_1786753361492680_7975184923832317449_n.jpg',
+            'images/239697528_525367972088239_5620429904857938783_n.jpg',
+            'images/310377770_3312985962315199_68466455150402006_n.jpg',
+            'images/313843793_5638036599589774_5112167168360310674_n.jpg',
+            'images/313851355_678190670297328_3123053017515208487_n.jpg',
+            'images/313852915_1070721593597021_7317912321735823821_n.jpg',
+            'images/313914617_682240856513002_3948867507483724422_n.jpg',
+            'images/315308003_3287643148177091_2400465916820476244_n (1).jpg',
+            'images/53051099_1981302465508196_785357706659864265_n.jpg',
+            'images/90710649_2629894620566159_1866899037223752325_n.jpg',
+            'images/91221882_213090123251041_9116725117342699283_n.jpg',
+            'images/91730101_667353620665649_734802778642280718_n.jpg',
+            'images/94387080_154212372758061_1334169763300600368_n.jpg',
+            'images/out2.mp4'
+        ];
     }
 }
 
