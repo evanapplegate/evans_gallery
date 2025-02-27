@@ -1,0 +1,24 @@
+name: Update Fallback List
+
+on:
+  push:
+    paths:
+      - 'images/**'
+
+jobs:
+  update-fallback:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Generate fallback list
+        run: |
+          cd images
+          echo "{\"files\": [\"$(ls *.{jpg,jpeg,png,gif,mp4,mov} 2>/dev/null | tr '\n' '\",\"' | sed 's/,\"$//')\"]}" > ../fallback.json
+      
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add fallback.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update fallback.json" && git push)
