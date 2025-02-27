@@ -1,0 +1,46 @@
+name: Update Media Files
+
+on:
+  push:
+    paths:
+      - 'images/**'
+  workflow_dispatch:
+
+jobs:
+  update-media:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+          
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+        
+      - name: Generate thumbnails
+        run: |
+          mkdir -p thumbnails
+          for video in images/*.{mp4,mov}; do
+            if [ -f "$video" ]; then
+              thumb="thumbnails/$(basename "${video%.*}").jpg"
+              ffmpeg -i "$video" -vframes 1 -f image2 "$thumb"
+            fi
+          done
+          
+      - name: Update fallback.json
+        run: |
+          echo '{"files":[' > fallback.json
+          (
+            cd images && \
+            find . -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.gif" -o -name "*.mp4" -o -name "*.mov" \) -exec basename {} \; | \
+            sed 's/.*/"&"/' | paste -sd "," -
+          ) >> fallback.json
+          echo ']}' >> fallback.json
+          
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add thumbnails fallback.json
+          git commit -m "chore: Update thumbnails and fallback.json" || exit 0
+          git push
