@@ -12,7 +12,7 @@ cd "$ROOT_DIR"
 mkdir -p thumbnails
 
 # Generate thumbnails for videos
-for video in images/*.{mp4,mov,MOV}; do
+for video in images/*.mp4; do
   if [ -f "$video" ]; then
     thumb="thumbnails/$(basename "${video%.*}").jpg"
     # Only generate if thumbnail doesn't exist or video is newer
@@ -27,9 +27,7 @@ done
 for thumb in thumbnails/*.jpg; do
   if [ -f "$thumb" ]; then
     video="images/$(basename "${thumb%.*}").mp4"
-    video2="images/$(basename "${thumb%.*}").mov"
-    video3="images/$(basename "${thumb%.*}").MOV"
-    if [ ! -f "$video" ] && [ ! -f "$video2" ] && [ ! -f "$video3" ]; then
+    if [ ! -f "$video" ]; then
       echo "Removing orphaned thumbnail: $thumb"
       rm "$thumb"
     fi
@@ -40,7 +38,7 @@ done
 echo '{"files":[' > fallback.json
 (
   cd images 2>/dev/null && \
-  find . -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.gif" -o -name "*.mp4" -o -name "*.mov" -o -name "*.MOV" \) -exec basename {} \; | \
+  find . -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.gif" -o -name "*.mp4" \) -exec basename {} \; | \
   sed 's/.*/"&"/' | paste -sd "," - || echo ""
 ) >> fallback.json
 echo ']}' >> fallback.json
