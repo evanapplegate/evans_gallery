@@ -115,9 +115,10 @@ h1 a:hover {
 .pagination button {
     padding: 0.5rem 1rem;
     border: 1px solid #ccc;
-    background: white;
+    background: #414144;
     cursor: pointer;
     font-size: 1.2rem;
+    color: #FEFAF6;
 }
 
 .pagination button:hover {
