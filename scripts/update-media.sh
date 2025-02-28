@@ -11,8 +11,20 @@ cd "$ROOT_DIR"
 # Create thumbnails directory if it doesn't exist
 mkdir -p thumbnails
 
+# Convert MOV to MP4
+for mov in images/*.{mov,MOV}; do
+  if [ -f "$mov" ]; then
+    mp4="images/$(basename "${mov%.*}").mp4"
+    if [ ! -f "$mp4" ] || [ "$mov" -nt "$mp4" ]; then
+      echo "Converting $mov to MP4"
+      ffmpeg -i "$mov" -c:v libx264 -preset medium -crf 23 -c:a aac -b:a 128k "$mp4"
+      git rm -f "$mov"
+    fi
+  fi
+done
+
 # Generate thumbnails for videos
-for video in images/*.{mp4,mov,MOV}; do
+for video in images/*.mp4; do
   if [ -f "$video" ]; then
     thumb="thumbnails/$(basename "${video%.*}").jpg"
     # Only generate if thumbnail doesn't exist or video is newer
@@ -27,9 +39,7 @@ done
 for thumb in thumbnails/*.jpg; do
   if [ -f "$thumb" ]; then
     base="${thumb%.*}"
-    if [ ! -f "images/$(basename "$base").mp4" ] && \
-       [ ! -f "images/$(basename "$base").mov" ] && \
-       [ ! -f "images/$(basename "$base").MOV" ]; then
+    if [ ! -f "images/$(basename "$base").mp4" ]; then
       echo "Removing orphaned thumbnail: $thumb"
       rm "$thumb"
     fi
@@ -40,7 +50,7 @@ done
 echo '{"files":[' > fallback.json
 (
   cd images 2>/dev/null && \
-  find . -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.gif" -o -name "*.mp4" -o -name "*.mov" -o -name "*.MOV" \) -exec basename {} \; | \
+  find . -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -name "*.png" -o -name "*.gif" -o -name "*.mp4" \) -exec basename {} \; | \
   sed 's/.*/"&"/' | paste -sd "," - || echo ""
 ) >> fallback.json
 echo ']}' >> fallback.json
