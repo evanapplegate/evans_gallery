@@ -11,14 +11,17 @@ cd "$ROOT_DIR"
 # Create thumbnails directory if it doesn't exist
 mkdir -p thumbnails
 
-# Convert MOV to MP4
+# Convert MOV to MP4 and delete original
 for mov in images/*.{mov,MOV}; do
   if [ -f "$mov" ]; then
     mp4="images/$(basename "${mov%.*}").mp4"
     if [ ! -f "$mp4" ] || [ "$mov" -nt "$mp4" ]; then
       echo "Converting $mov to MP4"
       ffmpeg -i "$mov" -c:v libx264 -preset medium -crf 23 -c:a aac -b:a 128k "$mp4"
-      git rm -f "$mov"
+      if [ $? -eq 0 ]; then
+        echo "Removing original MOV file: $mov"
+        rm "$mov"
+      fi
     fi
   fi
 done
