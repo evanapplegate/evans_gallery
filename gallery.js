@@ -6,37 +6,6 @@ let currentPage = 1;
 const itemsPerPage = 50;
 let allFiles = [];
 
-async function loadGallery() {
-    const gallery = document.getElementById('gallery');
-    gallery.innerHTML = '<div class="loading">Loading...</div>';
-    
-    try {
-        const files = await fetchImages();
-        const totalPages = Math.ceil(files.length / itemsPerPage);
-        const start = (currentPage - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
-        
-        gallery.innerHTML = '';
-        files.slice(start, end).forEach(path => gallery.appendChild(createGalleryItem(path)));
-        
-        if (files.length === 0) {
-            gallery.innerHTML = '<div class="loading">No images found</div>';
-        } else if (files.length > itemsPerPage) {
-            const nav = document.createElement('nav');
-            nav.className = 'pagination';
-            nav.innerHTML = `
-                <button ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">&larr;</button>
-                <span>${currentPage} / ${totalPages}</span>
-                <button ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">&rarr;</button>
-            `;
-            gallery.appendChild(nav);
-        }
-    } catch (error) {
-        console.error('Error loading gallery:', error);
-        gallery.innerHTML = '<div class="loading">Error loading gallery</div>';
-    }
-}
-
 function createGalleryItem(path) {
     const div = document.createElement('div');
     div.className = 'gallery-item';
@@ -95,6 +64,49 @@ function createGalleryItem(path) {
     }
     
     return div;
+}
+
+function createPaginationNav(totalPages) {
+    const nav = document.createElement('nav');
+    nav.className = 'pagination';
+    nav.innerHTML = `
+        <button ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">&larr;</button>
+        <span>${currentPage} / ${totalPages}</span>
+        <button ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">&rarr;</button>
+    `;
+    return nav;
+}
+
+async function loadGallery() {
+    const gallery = document.getElementById('gallery');
+    gallery.innerHTML = '<div class="loading">Loading...</div>';
+    
+    try {
+        const files = await fetchImages();
+        const totalPages = Math.ceil(files.length / itemsPerPage);
+        const start = (currentPage - 1) * itemsPerPage;
+        const end = start + itemsPerPage;
+        
+        gallery.innerHTML = '';
+
+        // Add top navigation if needed
+        if (files.length > itemsPerPage) {
+            gallery.appendChild(createPaginationNav(totalPages));
+        }
+        
+        // Add gallery items
+        files.slice(start, end).forEach(path => gallery.appendChild(createGalleryItem(path)));
+        
+        if (files.length === 0) {
+            gallery.innerHTML = '<div class="loading">No images found</div>';
+        } else if (files.length > itemsPerPage) {
+            // Add bottom navigation
+            gallery.appendChild(createPaginationNav(totalPages));
+        }
+    } catch (error) {
+        console.error('Error loading gallery:', error);
+        gallery.innerHTML = '<div class="loading">Error loading gallery</div>';
+    }
 }
 
 async function fetchImages() {
