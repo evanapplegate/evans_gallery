@@ -1,4 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Fix for iOS Safari touch events
+    document.addEventListener('touchstart', {});
+    
+    // Prevent iOS Safari overscroll behavior
+    document.body.addEventListener('touchmove', function(e) {
+        if (e.target.tagName !== 'VIDEO') {
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
     loadGallery();
 });
 
@@ -17,6 +27,8 @@ function createGalleryItem(path) {
         video.muted = true;
         video.controls = true;
         video.playsInline = true;
+        video.setAttribute('playsinline', '');
+        video.setAttribute('webkit-playsinline', '');
         video.style.display = 'none';
         
         const thumb = document.createElement('div');
@@ -44,7 +56,11 @@ function createGalleryItem(path) {
             e.stopPropagation();
             thumb.style.display = 'none';
             video.style.display = 'block';
-            video.play().catch(err => console.warn('Video playback error:', err));
+            
+            // iOS Safari specific fix for video playback
+            setTimeout(() => {
+                video.play().catch(err => console.warn('Video playback error:', err));
+            }, 50);
         }, { passive: true });
     } else {
         const link = document.createElement('a');

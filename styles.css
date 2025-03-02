@@ -1,8 +1,15 @@
 body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     margin: 0;
     background: #1a1a1a;
     font-family: Optima, -apple-system, system-ui, sans-serif;
     color: #fff;
+    /* Prevent overscroll bounce effect in iOS */
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
 }
 
 h1 {
@@ -143,12 +150,20 @@ video::-webkit-media-controls {
 
 video::-webkit-media-controls-panel {
     opacity: 0.8;
+    -webkit-appearance: none;
 }
 
 video::-webkit-media-controls-play-button,
 video::-webkit-media-controls-timeline,
 video::-webkit-media-controls-volume-slider {
     transform: scale(0.5);
+    -webkit-transform: scale(0.5);
+}
+
+/* iOS Safari specific fixes */
+html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Mobile-specific pagination layout */
@@ -161,6 +176,10 @@ video::-webkit-media-controls-volume-slider {
         padding: 10px 5px;
         background-color: rgba(26, 26, 26, 0.8);
         border-radius: 4px;
+        /* iOS Safari fixes */
+        -webkit-transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        -webkit-perspective: 1000;
     }
     
     .pagination button {
