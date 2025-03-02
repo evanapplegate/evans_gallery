@@ -174,15 +174,17 @@ html {
         flex-direction: column;
         align-items: center;
         gap: 5px;
-        margin: 15px 0;
-        padding: 10px 5px;
+        margin: 0;
+        padding: 5px;
         background-color: rgba(26, 26, 26, 0.8);
-        border-radius: 4px;
+        border-radius: 0;
         /* iOS Safari fixes */
         -webkit-transform: translateZ(0);
         -webkit-backface-visibility: hidden;
         -webkit-perspective: 1000;
         z-index: 1;
+        position: sticky;
+        top: 0;
     }
     
     .pagination button {
@@ -203,12 +205,14 @@ html {
     
     /* Ensure buttons don't overflow */
     .gallery {
-        padding-bottom: 15px;
+        padding-top: 0;
+        padding-bottom: 0;
     }
     
-    /* Add space between gallery and pagination */
+    /* Remove space between gallery and pagination */
     #gallery > .pagination:first-of-type {
-        margin-top: 15px;
+        margin-top: 0;
+        margin-bottom: 6px;
     }
     
     /* Reverse the order of buttons */

@@ -96,10 +96,12 @@ function createGalleryItem(path) {
 function createPaginationNav(totalPages) {
     const nav = document.createElement('nav');
     nav.className = 'pagination';
+    nav.setAttribute('role', 'navigation');
+    nav.setAttribute('aria-label', 'Pagination');
     nav.innerHTML = `
-        <button ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">&larr;</button>
-        <span>${currentPage} / ${totalPages}</span>
-        <button ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">&rarr;</button>
+        <button ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})" aria-label="Previous page">&larr;</button>
+        <span aria-live="polite">${currentPage} / ${totalPages}</span>
+        <button ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})" aria-label="Next page">&rarr;</button>
     `;
     return nav;
 }
