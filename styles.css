@@ -23,8 +23,8 @@ h1 a:hover {
 
 .gallery {
     columns: 6;
-    column-gap: 5px;
-    padding: 2px;
+    column-gap: 6px;
+    padding: 3px;
     max-width: 2000px;
     margin: 0 auto;
     width: 100%;
