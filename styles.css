@@ -157,6 +157,10 @@ video::-webkit-media-controls-volume-slider {
         flex-direction: column;
         align-items: center;
         gap: 5px;
+        margin: 15px 0;
+        padding: 10px 5px;
+        background-color: rgba(26, 26, 26, 0.8);
+        border-radius: 4px;
     }
     
     .pagination button {
@@ -167,6 +171,18 @@ video::-webkit-media-controls-volume-slider {
         justify-content: center;
         font-size: 0.8rem;
         padding: 0;
+        margin: 5px;
+        box-sizing: border-box;
+    }
+    
+    /* Ensure buttons don't overflow */
+    .gallery {
+        padding-bottom: 15px;
+    }
+    
+    /* Add space between gallery and pagination */
+    #gallery > .pagination:first-of-type {
+        margin-top: 15px;
     }
     
     /* Reverse the order of buttons */
