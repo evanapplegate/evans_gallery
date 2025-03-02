@@ -1,13 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Fix for iOS Safari touch events
-    document.addEventListener('touchstart', {});
+    document.addEventListener('touchstart', function(){}, {passive: true});
     
-    // Prevent iOS Safari overscroll behavior
+    // Remove problematic touchmove handler that might cause iOS warnings
+    /*
     document.body.addEventListener('touchmove', function(e) {
         if (e.target.tagName !== 'VIDEO') {
             e.preventDefault();
         }
     }, { passive: false });
+    */
+    
+    // Fix for iOS Safari scrolling issues
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+        document.documentElement.style.height = '100%';
+        document.body.style.height = '100%';
+        document.body.style.webkitOverflowScrolling = 'touch';
+    }
     
     loadGallery();
 });
