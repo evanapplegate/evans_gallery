@@ -16,6 +16,7 @@ function createGalleryItem(path) {
         video.preload = 'metadata';
         video.muted = true;
         video.controls = true;
+        video.playsInline = true;
         video.style.display = 'none';
         
         const thumb = document.createElement('div');
@@ -40,10 +41,11 @@ function createGalleryItem(path) {
         
         div.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation();
             thumb.style.display = 'none';
             video.style.display = 'block';
-            video.play();
-        });
+            video.play().catch(err => console.warn('Video playback error:', err));
+        }, { passive: true });
     } else {
         const link = document.createElement('a');
         link.href = path;
