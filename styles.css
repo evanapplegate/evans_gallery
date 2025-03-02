@@ -23,8 +23,8 @@ h1 a:hover {
 
 .gallery {
     columns: 6;
-    column-gap: 10px;
-    padding: 10px;
+    column-gap: 5px;
+    padding: 5px;
     max-width: 2000px;
     margin: 0 auto;
     width: 100%;
@@ -75,8 +75,8 @@ h1 a:hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 45px;
-    height: 45px;
+    width: 22px;
+    height: 22px;
     background: rgba(0, 0, 0, 0.7);
     border-radius: 50%;
     cursor: pointer;
@@ -90,9 +90,9 @@ h1 a:hover {
     width: 0;
     height: 0;
     border-style: solid;
-    border-width: 11px 0 11px 19px;
+    border-width: 5px 0 5px 9px;
     border-color: transparent transparent transparent #fff;
-    margin-left: 4px;
+    margin-left: 2px;
 }
 
 .gallery-item:hover .play-button {
@@ -114,11 +114,11 @@ h1 a:hover {
 }
 
 .pagination button {
-    padding: 0.25rem 0.55rem;
+    padding: 0.15rem 0.3rem;
     border: 1px solid #ccc;
     background: #414144;
     cursor: pointer;
-    font-size: 0.7rem;
+    font-size: 0.5rem;
     color: #FEFAF6;
 }
 
@@ -133,4 +133,20 @@ h1 a:hover {
 
 .pagination span {
     font-size: 0.85rem;
+}
+
+/* Custom styling for HTML5 video controls */
+video::-webkit-media-controls {
+    transform: scale(0.5);
+    transform-origin: bottom right;
+}
+
+video::-webkit-media-controls-panel {
+    opacity: 0.8;
+}
+
+video::-webkit-media-controls-play-button,
+video::-webkit-media-controls-timeline,
+video::-webkit-media-controls-volume-slider {
+    transform: scale(0.5);
 }
