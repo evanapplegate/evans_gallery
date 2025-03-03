@@ -183,8 +183,7 @@ html {
         -webkit-backface-visibility: hidden;
         -webkit-perspective: 1000;
         z-index: 1;
-        position: sticky;
-        top: 0;
+        position: static;
     }
     
     .pagination button {
