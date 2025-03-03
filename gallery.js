@@ -140,25 +140,27 @@ async function loadGallery() {
 
 async function fetchImages() {
     try {
-        const response = await fetch('https://api.github.com/repos/evanapplegate/evans_gallery/contents/images');
-        if (!response.ok) throw new Error('API request failed');
+        // Try fallback.json first to avoid cross-domain requests
+        const fallbackResponse = await fetch('fallback.json');
+        if (!fallbackResponse.ok) throw new Error('Fallback not found');
+        const { files } = await fallbackResponse.json();
+        return files.map(file => 
+            `https://media.githubusercontent.com/media/evanapplegate/evans_gallery/refs/heads/main/images/${file}`
+        );
+    } catch (fallbackError) {
+        console.error('Error loading fallback:', fallbackError);
         
-        const files = await response.json();
-        return files
-            .filter(file => /\.(jpe?g|png|gif|mp4|mov)$/i.test(file.name))
-            .map(file => `https://media.githubusercontent.com/media/evanapplegate/evans_gallery/refs/heads/main/images/${file.name}`);
-    } catch (error) {
-        console.error('Error:', error);
-        // Try fallback JSON
+        // Fall back to GitHub API if local file fails
         try {
-            const fallbackResponse = await fetch('fallback.json');
-            if (!fallbackResponse.ok) throw new Error('Fallback not found');
-            const { files } = await fallbackResponse.json();
-            return files.map(file => 
-                `https://media.githubusercontent.com/media/evanapplegate/evans_gallery/refs/heads/main/images/${file}`
-            );
-        } catch (fallbackError) {
-            console.error('Error loading fallback:', fallbackError);
+            const response = await fetch('https://api.github.com/repos/evanapplegate/evans_gallery/contents/images');
+            if (!response.ok) throw new Error('API request failed');
+            
+            const files = await response.json();
+            return files
+                .filter(file => /\.(jpe?g|png|gif|mp4|mov)$/i.test(file.name))
+                .map(file => `https://media.githubusercontent.com/media/evanapplegate/evans_gallery/refs/heads/main/images/${file.name}`);
+        } catch (error) {
+            console.error('Error:', error);
             return [];
         }
     }
