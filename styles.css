@@ -200,7 +200,7 @@ html {
     }
     
     .pagination button {
-        width: 40px; /* Smaller width to fit in column */
+        width: 45px; /* Smaller width to fit in column */
         height: 30px;
         display: flex;
         align-items: center;
