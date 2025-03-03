@@ -70,7 +70,7 @@ function createGalleryItem(path) {
             setTimeout(() => {
                 video.play().catch(err => console.warn('Video playback error:', err));
             }, 50);
-        }, { passive: true });
+        });
     } else {
         const link = document.createElement('a');
         link.href = path;
