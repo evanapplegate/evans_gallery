@@ -153,22 +153,24 @@ h1 a:hover {
     padding: 0 10px;
 }
 
-/* Custom styling for HTML5 video controls */
-video::-webkit-media-controls {
-    transform: scale(0.5);
-    transform-origin: bottom right;
-}
-
-video::-webkit-media-controls-panel {
-    opacity: 0.8;
-    -webkit-appearance: none;
-}
-
-video::-webkit-media-controls-play-button,
-video::-webkit-media-controls-timeline,
-video::-webkit-media-controls-volume-slider {
-    transform: scale(0.5);
-    -webkit-transform: scale(0.5);
+/* Custom styling for HTML5 video controls - Mobile only */
+@media (max-width: 767px) {
+    video::-webkit-media-controls {
+        transform: scale(0.5);
+        transform-origin: bottom right;
+    }
+    
+    video::-webkit-media-controls-panel {
+        opacity: 0.8;
+        -webkit-appearance: none;
+    }
+    
+    video::-webkit-media-controls-play-button,
+    video::-webkit-media-controls-timeline,
+    video::-webkit-media-controls-volume-slider {
+        transform: scale(0.5);
+        -webkit-transform: scale(0.5);
+    }
 }
 
 /* iOS Safari specific fixes */
