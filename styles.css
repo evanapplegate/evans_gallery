@@ -23,10 +23,14 @@ h1 {
     margin: 2rem 1rem;
     font-size: 1.2rem;
     color: #FEFAF6;
+    line-height: 1.3;
 }
 
 h1 a {
     color: inherit;
+    text-decoration-thickness: 0.5px;
+    text-underline-offset: 3px;
+
 }
 
 h1 a:hover {
