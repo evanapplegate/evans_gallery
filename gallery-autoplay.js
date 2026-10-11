@@ -74,6 +74,7 @@ function createGalleryItem({ file, url: path, thumb }, index) {
             // Reserve the right box before any video data arrives
             video.width = thumb.w[thumb.w.length - 1];
             video.height = thumb.h;
+            video.style.aspectRatio = `${video.width} / ${video.height}`;
         }
         
         div.appendChild(video);

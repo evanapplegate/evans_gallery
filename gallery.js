@@ -64,6 +64,12 @@ function createGalleryItem({ file, url: path, thumb }, index) {
         video.setAttribute('playsinline', '');
         video.setAttribute('webkit-playsinline', '');
         video.style.display = 'none';
+        if (thumb && thumb.w.length) {
+            // Hold the thumb's box while the video loads instead of collapsing to 300x150
+            video.width = thumb.w[thumb.w.length - 1];
+            video.height = thumb.h;
+            video.style.aspectRatio = `${video.width} / ${video.height}`;
+        }
         
         const thumbDiv = document.createElement('div');
         thumbDiv.className = 'thumb';
@@ -88,7 +94,11 @@ function createGalleryItem({ file, url: path, thumb }, index) {
         div.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            if (!video.src) video.src = path;
+            if (!video.src) {
+                // Thumb is already loaded, so show it until the first frame arrives
+                if (img.currentSrc && !img.currentSrc.startsWith('data:')) video.poster = img.currentSrc;
+                video.src = path;
+            }
             thumbDiv.style.display = 'none';
             video.style.display = 'block';
             
