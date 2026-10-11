@@ -25,14 +25,39 @@ let currentPage = 1;
 const itemsPerPage = 50;
 let allFiles = [];
 
-function createGalleryItem(path) {
+const MEDIA_URL = 'https://media.githubusercontent.com/media/evanapplegate/evans_gallery/refs/heads/main/images/';
+const THUMB_SLOTS = [400, 600, 800];
+// Grid is 6 CSS columns, capped at 2000px wide
+const THUMB_SIZES = '(min-width: 2000px) 330px, 17vw';
+const EAGER_COUNT = 12; // top two rows
+
+// Point an <img> at the WebP grid thumb for `file`, with srcset and real dimensions.
+// Returns false if no thumb is listed for it.
+function applyThumb(img, file, thumb, index) {
+    if (!thumb || !thumb.w.length) return false;
+    const base = file.replace(/\.[^.]+$/, '');
+    const url = i => `thumbs/${THUMB_SLOTS[i]}/${encodeURIComponent(base)}.webp`;
+    const last = thumb.w.length - 1;
+    img.src = url(last);
+    if (last > 0) {
+        img.srcset = thumb.w.map((w, i) => `${url(i)} ${w}w`).join(', ');
+        img.sizes = THUMB_SIZES;
+    }
+    img.width = thumb.w[last];
+    img.height = thumb.h;
+    img.loading = index < EAGER_COUNT ? 'eager' : 'lazy';
+    img.decoding = 'async';
+    return true;
+}
+
+function createGalleryItem({ file, url: path, thumb }, index) {
     const div = document.createElement('div');
     div.className = 'gallery-item';
     
     if (/\.(mp4|mov)$/i.test(path)) {
         const video = document.createElement('video');
-        video.src = path;
-        video.preload = 'metadata';
+        // src is set on click so nothing downloads until someone plays it
+        video.preload = 'none';
         video.muted = true;
         video.controls = true;
         video.playsInline = true;
@@ -40,30 +65,31 @@ function createGalleryItem(path) {
         video.setAttribute('webkit-playsinline', '');
         video.style.display = 'none';
         
-        const thumb = document.createElement('div');
-        thumb.className = 'thumb';
+        const thumbDiv = document.createElement('div');
+        thumbDiv.className = 'thumb';
         
         const img = document.createElement('img');
         img.alt = path.split('/').pop().split('.')[0].replace(/-/g, ' ');
-        img.loading = 'lazy';
-        // Use pre-generated thumbnail from GitHub
-        img.src = path.replace(/\.(mp4|mov)$/i, '.jpg').replace('/images/', '/thumbnails/');
         img.onerror = () => {
+            img.onerror = null;
+            img.removeAttribute('srcset');
             img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M10 9v6l5-3-5-3z"/></svg>';
         };
+        if (!applyThumb(img, file, thumb, index)) img.onerror();
         
         const playBtn = document.createElement('div');
         playBtn.className = 'play-button';
         
-        thumb.appendChild(img);
-        thumb.appendChild(playBtn);
-        div.appendChild(thumb);
+        thumbDiv.appendChild(img);
+        thumbDiv.appendChild(playBtn);
+        div.appendChild(thumbDiv);
         div.appendChild(video);
         
         div.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            thumb.style.display = 'none';
+            if (!video.src) video.src = path;
+            thumbDiv.style.display = 'none';
             video.style.display = 'block';
             
             // iOS Safari specific fix for video playback
@@ -78,10 +104,21 @@ function createGalleryItem(path) {
         link.rel = 'noopener';
         
         const img = document.createElement('img');
-        img.src = path;
         img.alt = path.split('/').pop().split('.')[0].replace(/-/g, ' ');
-        img.loading = 'lazy';
+        const hasThumb = applyThumb(img, file, thumb, index);
+        if (!hasThumb) {
+            img.src = path;
+            img.loading = 'lazy';
+        }
+        let triedOriginal = !hasThumb;
         img.onerror = () => {
+            // Missing thumb: fall back to the original once
+            if (!triedOriginal) {
+                triedOriginal = true;
+                img.removeAttribute('srcset');
+                img.src = path;
+                return;
+            }
             img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>';
             img.alt = 'Failed to load';
         };
@@ -124,7 +161,7 @@ async function loadGallery() {
         }
         
         // Add gallery items
-        files.slice(start, end).forEach(path => gallery.appendChild(createGalleryItem(path)));
+        files.slice(start, end).forEach((item, i) => gallery.appendChild(createGalleryItem(item, i)));
         
         if (files.length === 0) {
             gallery.innerHTML = '<div class="loading">No images found</div>';
@@ -143,10 +180,8 @@ async function fetchImages() {
         // Try fallback.json first to avoid cross-domain requests
         const fallbackResponse = await fetch('fallback.json');
         if (!fallbackResponse.ok) throw new Error('Fallback not found');
-        const { files } = await fallbackResponse.json();
-        return files.map(file => 
-            `https://media.githubusercontent.com/media/evanapplegate/evans_gallery/refs/heads/main/images/${file}`
-        );
+        const { files, thumbs = {} } = await fallbackResponse.json();
+        return files.map(file => ({ file, url: MEDIA_URL + file, thumb: thumbs[file] }));
     } catch (fallbackError) {
         console.error('Error loading fallback:', fallbackError);
         
@@ -158,7 +193,7 @@ async function fetchImages() {
             const files = await response.json();
             return files
                 .filter(file => /\.(jpe?g|png|gif|mp4|mov)$/i.test(file.name))
-                .map(file => `https://media.githubusercontent.com/media/evanapplegate/evans_gallery/refs/heads/main/images/${file.name}`);
+                .map(file => ({ file: file.name, url: MEDIA_URL + file.name }));
         } catch (error) {
             console.error('Error:', error);
             return [];
